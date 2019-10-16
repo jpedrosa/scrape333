@@ -100,3 +100,9 @@ desafio.
 * A diferença de performance entre as bibliotecas de parsing do HTML não é tanta
 quando se faz apenas uma requisição de tempos em tempos. A diferença pode pesar
 mais se forem feitas centenas ou milhares de requisições.
+
+# Instalação
+
+O 
+[README padrão](https://github.com/jpedrosa/scrape333/blob/master/README.md#instala%C3%A7%C3%A3o) 
+contém instruções para instalação.
