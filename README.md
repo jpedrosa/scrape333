@@ -157,9 +157,9 @@ programas dentro do diretório bin também.
 Exemplo de instalação:
 
 ```
-> git clone https://github.com/jpedrosa/desafio333.git
+> git clone https://github.com/jpedrosa/scrape333.git
 [...]
-> cd .\desafio333\2019-Outubro-Url-Preview\jpedrosa\
+> cd .\scrape333\
 > npm install
 > npm start
 ```
