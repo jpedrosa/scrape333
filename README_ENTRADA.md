@@ -33,11 +33,10 @@ semana batendo cabeça não resolva.
 
 # Teste
 
-Para testar o projeto, você por ir ao
-[site](https://scrape333.herokuapp.com/index.html) ao vivo hospedado no
-Heroku. A página de Scrape permite fazer scraping de qualquer página, embora
-por padrão use a [página de teste](https://scrape333.herokuapp.com/frutas) do 
-próprio projeto.
+Para testar o projeto, você pode ir ao
+[site](https://scrape333.herokuapp.com/index.html) hospedado no Heroku. A página
+de Scrape permite fazer scraping de qualquer página, embora por padrão use a
+[página de teste](https://scrape333.herokuapp.com/frutas) do próprio projeto.
 
 Outras informações se encontram no
 [README padrão do projeto.](https://github.com/jpedrosa/scrape333)
@@ -101,6 +100,20 @@ desafio.
 * A diferença de performance entre as bibliotecas de parsing do HTML não é tanta
 quando se faz apenas uma requisição de tempos em tempos. A diferença pode pesar
 mais se forem feitas centenas ou milhares de requisições.
+
+# Resultados retornados pelo scraping
+
+* domain - Ex: "pudim.com.br"
+* title
+* meta description
+* meta keywords
+* meta author
+* meta og:title
+* meta og:description
+* meta og:site_name
+* meta og:image
+* thumbnail
+* images
 
 # Instalação
 
