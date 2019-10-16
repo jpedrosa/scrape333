@@ -88,7 +88,8 @@ o scraping das imagens da página.
 
 * O página do
 [Scrape](https://github.com/jpedrosa/scrape333/blob/master/templates/scrape.ejs) 
-faz uma requisição post com o objeto XMLHttpRequest do JavaScript.
+faz uma requisição post com o objeto XMLHttpRequest do JavaScript. Na hora da
+requisição existe uma diferença entre uma requisição por json ou por HTML form.
 
 * Se o thumbnail não existir no meta tag "og:image", então a primeira imagem que
 aparecer na página será usada como thumbnail. Um problema existe quando essa
