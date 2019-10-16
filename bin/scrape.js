@@ -28,19 +28,15 @@ const args = arg({
 const mode = args["--mode"];
 const output = args["--output"];
 
-function doScrape(s, url) {
+function doScrape(s, url, uo) {
     if (output === "rawHtml") {
         console.log(s);
         return;
     }
     const startAt = new Date();
-    let results;
-    if (mode === "loose") {
-        results = scrape.scrapeLoose(s, url);
-    } else if (mode === "parse5") {
-        results = scrape.scrape(s, url);
-    } else {
-        results = scrape.cheerioScrape(s, url);
+    const results = scrape.scrape(s, url, mode);
+    if (uo) {
+        results["domain"] = uo.hostname;
     }
     const ms = new Date() - startAt;
     
@@ -96,7 +92,8 @@ if (args["--help"]) {
     // Normalize the URL so that it includes a trailing slash (/) at least.
     // E.g. from http://pudim.com.br to http://pudim.com.br/
     // This is used when normalizing image src that includes joining paths.
-    const url = new URL(args["--url"]).toString(); 
+    const uo = new URL(args["--url"]);
+    const url = uo.toString(); 
 
     request(url, 
         (err, res, body) => {
@@ -104,7 +101,7 @@ if (args["--help"]) {
             console.error(err);
             process.exit(1);
         } else if (res.statusCode === 200) {
-            doScrape(body, url);
+            doScrape(body, url, uo);
         } else {
             console.error("Error. Could not process the server response with " +
                 `a status code of "${res.statusCode}"`);
