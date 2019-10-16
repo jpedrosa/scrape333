@@ -72,7 +72,7 @@ O projeto também inclui ferramentas de linha de comando que ficam dentro do
 [./bin](https://github.com/jpedrosa/scrape333/tree/master/bin) do projeto. O
 arquivo
 [./bin/scrape.js](https://github.com/jpedrosa/scrape333/blob/master/bin/scrape.js)
-tem opções para operar em arquivos locais e em URLs e pode ser usado para testar
+tem opções para operar em arquivos locais ou em URLs e pode ser usado para testar
 os algoritmos alternativos.
 
 Já o arquivo
