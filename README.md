@@ -1,6 +1,7 @@
 # Introdução.
 
-Assistindo a live do desafio333, resolvi tentar fazer este desafio.
+Assistindo a live do [Desafio333](https://github.com/codigofalado/desafio333),
+resolvi tentar fazer este desafio.
 Primeiramente pensei em fazer na linguagem de programação chamada Rust que é
 de mais baixo nível, mas enfrentei alguns problemas e refiz os planos para
 desenvolver em NodeJS.
