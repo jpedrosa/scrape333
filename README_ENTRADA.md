@@ -45,7 +45,7 @@ Outras informações se encontram no
 Para fazer uma requisição de método post como exigido no desafio, basta apontar
 para o URL
 [https://scrape333.herokuapp.com/scrape](https://scrape333.herokuapp.com/scrape)
-, enviando como parâmetro json ou form o url da página a ser feita o scraping.
+, enviando como parâmetro json ou form o URL da página a ser feita o scraping.
 
 O exemplo a seguir mostra como:
 
