@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Imagens de frutas para exemplo.</title>
-        <meta name="description" content="Página contendo imagens e metadados para exemplo.">
-        <meta name="keywords" content="frutas,ejs,fastify,desafio333">
+        <title>Scrape</title>
+        <meta name="description" content="Interface de scrape do projeto.">
+        <meta name="keywords" content="scrape,desafio333,meta tags,imagens">
         <meta name="author" content="Joao Pedrosa">
-        <meta property="og:title" content="Exemplo para o Desafio333 contendo imagens e metadados.">
-        <meta property="og:description" content="A descrição mais detalhada o possível deste exemplo de imagens e metadados.">
+        <meta property="og:title" content="Scrape do projeto para o Desafio333.">
+        <meta property="og:description" content="Ferramenta de Scrape que retorna meta tags e imagens.">
         <meta property="og:site_name" content="Scrape333">
-        <!-- <meta property="og:image" content="Scrape333.png"> -->
         <link rel="stylesheet" href="styles.css">
         <script>
+
+"use strict";
+
+const reURLStart = new RegExp("^([hH][tT][tT][pP][sS]?://|[fF][iI][lL][eE]:///)");
 
 function escapeHtml(s) {
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -26,9 +29,9 @@ function getFrutasURL() {
     return s.replace(re, "/frutas");
 }
 
-function presentResults(s) {
-    const o = JSON.parse(s);
-    const divEl = el("results");
+let resultsDivEl;
+
+function presentResults(o) {
     let z = "";
     let images;
     let thumbnail;
@@ -58,17 +61,35 @@ function presentResults(s) {
         z += '<span class="resultsKey">images:</span><br />' +
             `<textarea class="resultsImages">${a}</textarea>`;
     }
-    divEl.innerHTML = z;
+    resultsDivEl.innerHTML = z;
+}
+
+function handleError(o) {
+    const s = o["scrapeError"];
+    if (s) {
+        resultsDivEl.innerHTML = '<span class="scrapeError">Erro:</span> ' +
+            `<span class="scrapeErrorMessage">${escapeHtml(s)}</span> ` +
+            "🤣 🤦 😜";;
+        return false;
+    }
+    return true;
 }
 
 function scrape(url, jsonReqType) {
-    var xhttp = new XMLHttpRequest();
-    var serverUrl = window.location.href;
+    const xhttp = new XMLHttpRequest();
+    const serverUrl = window.location.href;
+    // Como usabilidade, adiciona o prefix http:// se o URL estiver faltando.
+    if (!reURLStart.test(url)) {
+        url = `http://${url}`;
+    }
+    // O parâmetro true aqui indica que a chamada será async.
     xhttp.open('POST', serverUrl, true);
-    xhttp.onreadystatechange = function() {
+    xhttp.onreadystatechange = () => {
         if (xhttp.readyState === 4 && xhttp.status === 200) {
-            // console.log("response " + xhttp.responseText);
-            presentResults(xhttp.responseText);
+            const o = JSON.parse(xhttp.responseText);
+            if (handleError(o)) {
+                presentResults(o);
+            }
         }
     }
     if (jsonReqType) {
@@ -83,6 +104,7 @@ function scrape(url, jsonReqType) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    resultsDivEl = el("results");
     const formEl = el("scrapeForm");
     const urlEl = el("urlInput");
     const jsonReqTypeEl = el("jsonRequestType");
@@ -90,14 +112,10 @@ window.addEventListener('DOMContentLoaded', () => {
     formEl.addEventListener("submit", (ev) => {
         // Interrompe o browser de tentar lidar com o form submit.
         ev.preventDefault();
+        resultsDivEl.innerHTML = "";
         scrape(urlEl.value.trim(), jsonReqTypeEl.checked);
-        // console.log("checked" + jsonReqTypeEl.checked);
-        // console.log(window.location.href);
-        // console.log(getFrutasURL());
-        // console.log("value " + urlEl.value);
     });
 });
-
 
         </script>
     </head>

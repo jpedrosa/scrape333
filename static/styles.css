@@ -17,3 +17,11 @@ body {
     width: 500px;
     height: 100px;
 }
+
+.scrapeError {
+    color: #c72116;
+}
+
+.scrapeErrorMessage {
+    color: #f02b1d;
+}
