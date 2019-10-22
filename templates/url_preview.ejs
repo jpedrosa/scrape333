@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Teste de URL Preview</title>
+        <meta name="description" content="Interface simples para o teste de URL preview.">
+        <meta name="keywords" content="url,preview,desafio333,scrape333">
+        <meta name="author" content="Joao Pedrosa">
+        <meta property="og:site_name" content="Scrape333">
+        <link rel="stylesheet" href="styles.css">
+        <script>
+
+"use strict";
+
+const reURLStart = new RegExp("^([hH][tT][tT][pP][sS]?://|[fF][iI][lL][eE]:///)");
+
+function escapeHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function el(id) {
+    return document.getElementById(id);
+}
+
+function getServiceURL() {
+    const re = new RegExp("/[^/]*$");
+    let s = window.location.href;
+    return s.replace(re, "/scrape");
+}
+
+let resultsDivEl;
+let textBoxEl;
+let serviceUrlEl;
+let jsonReqTypeEl;
+
+function presentResults(o) {
+    let z = "";
+    const keys = ["domain", "sitename", "title", "description"];
+    for (let k of keys) {
+        let value = o[k];
+        if (typeof value === "string") {
+            value = escapeHtml(value);
+            z += `<span class="resultsKey">${k}:</span> ` +
+                `<span class="resultsValue">${value}</span><br />`;
+        } else {
+            handleError({scrapeError: `Wrong field type: ${k} has value of ` +
+                `type ${typeof value}`});
+        }
+    }
+    const thumb = o["thumbnail"];
+    if (thumb) {
+        if (typeof thumb === "string") {
+            z += '<span class="resultsKey">thumbnail:</span><br />' +
+                '<img class="previewThumbnail" ' + 
+                `src="${escapeHtml(thumb)}"><br />`;
+        } else {
+            handleError({scrapeError: `Wrong thumbnail type: ${typeof thumb}`});
+        }
+    }
+    resultsDivEl.innerHTML = z;
+}
+
+function handleError(o) {
+    const s = o["scrapeError"];
+    if (s) {
+        resultsDivEl.innerHTML = '<span class="scrapeError">Erro:</span> ' +
+            `<span class="scrapeErrorMessage">${escapeHtml(s)}</span> ` +
+            "🤣 🤦 😜";;
+        return false;
+    }
+    return true;
+}
+
+function preview(url) {
+    const xhttp = new XMLHttpRequest();
+    let serverUrl = serviceUrlEl.value.trim();
+    // Como usabilidade, adiciona o prefix http:// se o URL estiver faltando.
+    if (!reURLStart.test(serverUrl)) {
+        serverUrl = `http://${serverUrl}`;
+    }
+    if (!reURLStart.test(url)) {
+        url = `http://${url}`;
+    }
+    // O parâmetro true aqui indica que a chamada será async.
+    xhttp.open('POST', serverUrl, true);
+    xhttp.onreadystatechange = () => {
+        if (xhttp.readyState === 4 && xhttp.status === 200) {
+            const o = JSON.parse(xhttp.responseText);
+            if (handleError(o)) {
+                presentResults(o);
+            }
+        } else if (xhttp.status === 0) {
+            handleError({scrapeError: "Maybe the scrape service server is " +
+                "offline, the connection has been refused, or the URL is " +
+                "incorrect: " + `"${serverUrl}"`});
+        } else if (xhttp.readyState === 4 && xhttp.status !== 200) {
+            handleError({scrapeError: "Expected status code 200 and got " +
+                xhttp.status + "instead."});
+        }
+    }
+    if (jsonReqTypeEl.checked) {
+        const params = {url: url};
+        xhttp.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
+        xhttp.send(JSON.stringify(params));
+    } else {
+        const params = `url=${encodeURI(url)}`;
+        xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhttp.send(params);
+    }
+}
+
+// Find all URL-like strings. Starting with http:// or https://
+const reUrl = new RegExp(/[hH][tT][tT][pP][sS]?:\/\/[^\s]+/g);
+let queueUrl;
+let stampUrl;
+const WAIT_TIME = 3000; // ms
+
+function preparePreview() {
+    resultsDivEl.innerHTML = '#Loading... <div class="lds-ring">' +
+            '<div></div><div></div><div></div><div></div></div>';
+    preview(queueUrl);
+    queueUrl = null;
+    stampUrl = null;
+}
+
+function timeoutHandler() {
+    if (!queueUrl) {
+        stampUrl = null;
+        // Ignore. The URL was probably removed from the text before the
+        // the timeout finished.
+    } else if (stampUrl !== queueUrl) {
+        stampUrl = queueUrl;
+        setTimeout(timeoutHandler, WAIT_TIME);
+    } else {
+        preparePreview();
+    }
+}
+
+function trackChanges() {
+    // Converts the iteratable returned by the matchAll call into an array
+    // for the easier indexing, since we want the last match.
+    let m = Array.from(textBoxEl.value.matchAll(reUrl));
+    if (m.length > 0) {
+        // Array with the matches. To get the actual string we need to 
+        // ask the match object for its first overall match with the [0] index.
+        // We find the last URL on the text and try to preview it.
+        const lastMatch = m[m.length - 1];
+        let u = lastMatch[0];
+        queueUrl = u;
+        if (!stampUrl) {
+            stampUrl = u;
+            setTimeout(timeoutHandler, WAIT_TIME);
+        }
+    } else {
+        resultsDivEl.innerHTML = '';
+        queueUrl = null;
+        stampUrl = null;
+    }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    resultsDivEl = el("results");
+    textBoxEl = el("textBox");
+    serviceUrlEl = el("serviceUrl");
+    jsonReqTypeEl = el("jsonRequestType");
+    textBoxEl.addEventListener("input", trackChanges);
+    el("setDefaultServiceUrl").addEventListener("click", (ev) => {
+        serviceUrlEl.value = getServiceURL();
+    });
+    serviceUrlEl.value = getServiceURL();
+});
+
+        </script>
+    </head>
+    <body>
+        <%- include("navigation") %>
+        <h1>URL Preview</h1>
+        URL do serviço: <input id="serviceUrl" type="text" size="40" />
+        <input id="setDefaultServiceUrl" type="button" value="Colocar padrão" /> <br>
+        Método de requisição:
+        <input id="jsonRequestType" type="radio" name="requestType" value="json" checked> JSON
+        <input type="radio" name="requestType" value="form"> Form            
+        <div class="previewPanel">
+            <div class="urlPreviewPanel">
+                <textarea id="textBox" class="textBox"></textarea>
+                <div id="results" class="previewResultsPanel"></div>
+            </div>
+        </div>
+    </body>
+</html>

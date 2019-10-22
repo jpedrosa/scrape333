@@ -26,6 +26,38 @@ body {
     color: #f02b1d;
 }
 
+.previewPanel {
+    width: 500px;
+    height: 600px;
+    font-size: 120%;
+}
+
+.urlPreviewPanel {
+    border-radius: 10px;
+    border: 2px solid #e5e5e5;
+    padding: 4px;
+    flex: display;
+    flex-direction: column;
+    height: 100%;
+}
+
+.previewResultsPanel {
+    border-radius: 10px;
+    border: 2px solid #e5e5e5;
+    padding: 4px;
+    height: 81%;
+}
+
+.textBox {
+    height: 15%;
+    width: 98%;
+    font-size: 100%;
+}
+
+.previewThumbnail {
+    max-width: 100%;
+}
+
 /* Loading animation */
 .lds-ring {
     display: inline-block;
