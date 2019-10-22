@@ -27,10 +27,16 @@ function getServiceURL() {
     return s.replace(re, "/scrape");
 }
 
+function getRequestPreviewServiceURL() {
+    const re = new RegExp("/[^/]*$");
+    let s = window.location.href;
+    return s.replace(re, "/request_preview");
+}
+
 let resultsDivEl;
 let textBoxEl;
 let serviceUrlEl;
-let jsonReqTypeEl;
+let lastUrlReceived;
 
 function presentResults(o) {
     let z = "";
@@ -72,47 +78,42 @@ function handleError(o) {
 
 function preview(url) {
     const xhttp = new XMLHttpRequest();
-    let serverUrl = serviceUrlEl.value.trim();
+    let serviceUrl = serviceUrlEl.value.trim();
     // Como usabilidade, adiciona o prefix http:// se o URL estiver faltando.
-    if (!reURLStart.test(serverUrl)) {
-        serverUrl = `http://${serverUrl}`;
+    if (!reURLStart.test(serviceUrl)) {
+        serviceUrl = `http://${serviceUrl}`;
     }
     if (!reURLStart.test(url)) {
         url = `http://${url}`;
     }
     // O parâmetro true aqui indica que a chamada será async.
-    xhttp.open('POST', serverUrl, true);
+    xhttp.open('POST', getRequestPreviewServiceURL(), true);
     xhttp.onreadystatechange = () => {
         if (xhttp.readyState === 4 && xhttp.status === 200) {
             const o = JSON.parse(xhttp.responseText);
             if (handleError(o)) {
+                lastUrlReceived = o["_url"];
+                console.log("lastUrlReceived " + lastUrlReceived);
                 presentResults(o);
             }
         } else if (xhttp.status === 0) {
-            handleError({scrapeError: "Maybe the scrape service server is " +
+            handleError({scrapeError: "Maybe the service server is " +
                 "offline, the connection has been refused, or the URL is " +
-                "incorrect: " + `"${serverUrl}"`});
+                "incorrect: " + `"${serviceUrl}"`});
         } else if (xhttp.readyState === 4 && xhttp.status !== 200) {
             handleError({scrapeError: "Expected status code 200 and got " +
                 xhttp.status + "instead."});
         }
     }
-    if (jsonReqTypeEl.checked) {
-        const params = {url: url};
-        xhttp.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
-        xhttp.send(JSON.stringify(params));
-    } else {
-        const params = `url=${encodeURI(url)}`;
-        xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        xhttp.send(params);
-    }
+    xhttp.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
+    xhttp.send(JSON.stringify({serviceUrl: serviceUrl, url: url}));
 }
 
 // Find all URL-like strings. Starting with http:// or https://
 const reUrl = new RegExp(/[hH][tT][tT][pP][sS]?:\/\/[^\s]+/g);
 let queueUrl;
 let stampUrl;
-const WAIT_TIME = 3000; // ms
+const WAIT_TIME = 2500; // ms
 
 function preparePreview() {
     resultsDivEl.innerHTML = '#Loading... <div class="lds-ring">' +
@@ -130,6 +131,11 @@ function timeoutHandler() {
     } else if (stampUrl !== queueUrl) {
         stampUrl = queueUrl;
         setTimeout(timeoutHandler, WAIT_TIME);
+    } else if (lastUrlReceived === queueUrl) {
+        // Same as the last one. So we ignore the request.
+        console.log("SAME URL! STOP IT! " + lastUrlReceived);
+        queueUrl = null;
+        stampUrl = null;
     } else {
         preparePreview();
     }
@@ -161,7 +167,6 @@ window.addEventListener('DOMContentLoaded', () => {
     resultsDivEl = el("results");
     textBoxEl = el("textBox");
     serviceUrlEl = el("serviceUrl");
-    jsonReqTypeEl = el("jsonRequestType");
     textBoxEl.addEventListener("input", trackChanges);
     el("setDefaultServiceUrl").addEventListener("click", (ev) => {
         serviceUrlEl.value = getServiceURL();
@@ -176,9 +181,6 @@ window.addEventListener('DOMContentLoaded', () => {
         <h1>URL Preview</h1>
         URL do serviço: <input id="serviceUrl" type="text" size="40" />
         <input id="setDefaultServiceUrl" type="button" value="Colocar padrão" /> <br>
-        Método de requisição:
-        <input id="jsonRequestType" type="radio" name="requestType" value="json" checked> JSON
-        <input type="radio" name="requestType" value="form"> Form            
         <div class="previewPanel">
             <div class="urlPreviewPanel">
                 <textarea id="textBox" class="textBox"></textarea>
