@@ -9,6 +9,11 @@ desenvolver em NodeJS.
 Pouco usei NodeJS até hoje, então para mim está sendo um aprendizado do mesmo
 jeito. Bem de acordo com os ideais do desafio.
 
+Sistema de [URL Preview](https://scrape333.herokuapp.com/url_preview) como
+nesta imagem:
+
+![URL Preview](./static/imagens/url_preview.gif)
+
 # Tecnologias
 
 ## Scraping
