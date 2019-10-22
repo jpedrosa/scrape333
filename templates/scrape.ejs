@@ -90,6 +90,12 @@ function scrape(url, jsonReqType) {
             if (handleError(o)) {
                 presentResults(o);
             }
+        } else if (xhttp.status === 0) {
+            handleError({scrapeError: "Maybe the scrape service server is " +
+                "offline or the connection has been refused."});
+        } else if (xhttp.readyState === 4 && xhttp.status !== 200) {
+            handleError({scrapeError: "Expected status code 200 and got " +
+                xhttp.status + "instead."});
         }
     }
     if (jsonReqType) {
@@ -112,7 +118,9 @@ window.addEventListener('DOMContentLoaded', () => {
     formEl.addEventListener("submit", (ev) => {
         // Interrompe o browser de tentar lidar com o form submit.
         ev.preventDefault();
-        resultsDivEl.innerHTML = "";
+        // CSS Loading animation
+        resultsDivEl.innerHTML = '#Loading... <div class="lds-ring">' +
+            '<div></div><div></div><div></div><div></div></div>';
         scrape(urlEl.value.trim(), jsonReqTypeEl.checked);
     });
 });
