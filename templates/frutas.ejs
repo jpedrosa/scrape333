@@ -16,7 +16,7 @@
         <div style="padding-left:40px">
 <% for (let i = 0; i < frutas.length; i += 2) { %>
     <h1><%= frutas[i] %></h1>
-    <a href="https://pt.wikipedia.org/wiki/<%= frutas[i] %>"><img src="/imagens/<%= frutas[i + 1] %>"></a>
+    <a href="https://pt.wikipedia.org/wiki/<%= frutas[i] %>"><img alt="Fruta <%= frutas[i].toLowerCase() %>" src="/imagens/<%= frutas[i + 1] %>"></a>
 <% } %>
         </div>
     </body>

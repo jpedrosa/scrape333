@@ -56,7 +56,7 @@ function presentResults(o) {
     if (thumb) {
         if (typeof thumb === "string") {
             z += '<span class="resultsKey">thumbnail:</span><br />' +
-                '<img class="previewThumbnail" ' + 
+                '<img alt="Thumbnail" class="previewThumbnail" ' + 
                 `src="${escapeHtml(thumb)}"><br />`;
         } else {
             handleError({scrapeError: `Wrong thumbnail type: ${typeof thumb}`});
